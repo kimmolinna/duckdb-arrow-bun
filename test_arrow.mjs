@@ -34,7 +34,7 @@ const vlSpecApi = JSON.stringify( // wrap everything in stringify to create a cl
       vl.y().fieldQ("consumption")
     )
     .height(200)
-    .data(ipc.toArray())
+    .data([...ipc])
     .toObject() // call toObject() instead of render()
 )
 const vlSpec = JSON.parse(vlSpecApi); // parse the string to get the object
@@ -45,6 +45,7 @@ view.toSVG().then(async function (svg) {
 }).catch(function(err) {
   console.error(err);
 });
-console.table(ipc.toArray()); 
+
+console.table([...ipc]); 
 disconnect(connection);
 close(db);
