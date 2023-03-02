@@ -9,19 +9,20 @@ const connection_garbage = new FinalizationRegistry(pointer => library.disconnec
 
 class Database {
   #pointer;
-
+  
   constructor(pointer) {
     this.#pointer = pointer;
     database_garbage.register(this, pointer, this);
   }
 
-  close() { 
-    library.close(this.#pointer);
-     database_garbage.unregister(this); 
-    }
   connect() { 
     return new Connection(this, library.connect(this.#pointer)); 
   }
+
+  close() { 
+    library.close(this.#pointer);
+    database_garbage.unregister(this); 
+    }
 }
 
 class Connection {
@@ -33,9 +34,11 @@ class Connection {
     this.#pointer = pointer;
     connection_garbage.register(this, pointer, this);
   }
-
+  query(sql) {
+    return library.query(this.#pointer, sql);
+  }
   query_ipc(sql) { 
-    return library.query(this.#pointer, sql); 
+    return library.query_ipc(this.#pointer, sql); 
   }
   close() { 
     library.disconnect(this.#pointer); 

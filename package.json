@@ -1,1 +1,24 @@
-{ "dependencies": { "apache-arrow": "^11.0.0", "vega": "^5.22.1", "vega-lite": "^5.6.1", "vega-lite-api": "^5.6.0" } }
+{
+  "version": "0.1.2",
+  "name": "@kimmolinna/duckdb-arrow-bun",
+  "license": "MIT",
+  "description": "DuckDB results as Apache Arrow RecordBatch for Bun runtime",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kimmolinna/duckdb-arrow-bun.git"
+  },
+  "files": [
+    "bin/*",
+    "lib.mjs",
+    "index.mjs"
+  ],
+  "devDpendencies": {
+    "apache-arrow": "^11.0.0"
+  },
+  "dependencies": {
+    "apache-arrow": "^11.0.0",
+    "vega": "^5.22.1",
+    "vega-lite": "^5.6.1",
+    "vega-lite-api": "^5.6.0"
+  }
+}

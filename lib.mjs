@@ -1,10 +1,10 @@
 import { ptr, dlopen, toArrayBuffer } from 'bun:ffi';
-import { RecordBatchReader } from './node_modules/apache-arrow/Arrow.mjs';
+import { RecordBatchReader } from 'apache-arrow';
 
 const utf8e = new TextEncoder();
 
 const path = {
-  linux() { return new URL(`./bin/libduckdb.so`, import.meta.url); },
+  linux() { return new URL(`./bin/libduckdb_bun.so`, import.meta.url); },
   darwin() { return new URL(`./bin/libduckdb_bun.dylib`, import.meta.url); },
 }[process.platform]().pathname;
 
@@ -40,6 +40,7 @@ export function open(path) {
   if (0 === db) throw new Error('duckdb: failed to open database');
   return db;
 }
+
 export function query(c, query) {
   const res = dab.dab_query(c, ptr(utf8e.encode(query + '\0')));
   return res;
