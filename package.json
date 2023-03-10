@@ -1,12 +1,10 @@
 {
-  "version": "0.1.2",
+  "version": "0.1.3",
   "name": "@kimmolinna/duckdb-arrow-bun",
   "license": "MIT",
   "description": "DuckDB results as Apache Arrow RecordBatch for Bun runtime",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/kimmolinna/duckdb-arrow-bun.git"
-  },
+  "module": "index.mjs",
+  "type": "module",
   "files": [
     "bin/*",
     "lib.mjs",

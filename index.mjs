@@ -1,47 +1,44 @@
-import * as library from './lib.mjs';
+import * as lib from './lib.mjs';
 
 export function open(path) {
-  return new Database(library.open(path));
+  return new Database(lib.open(path));
 }
 
-const database_garbage = new FinalizationRegistry(pointer => library.close(pointer));
-const connection_garbage = new FinalizationRegistry(pointer => library.disconnect(pointer));
+const db_gc = new FinalizationRegistry(ptr => lib.close(ptr));
+const con_gc = new FinalizationRegistry(ptr => lib.disconnect(ptr));
 
 class Database {
-  #pointer;
+  #ptr;
   
-  constructor(pointer) {
-    this.#pointer = pointer;
-    database_garbage.register(this, pointer, this);
+  constructor(ptr) {
+    this.#ptr = ptr;
+    db_gc.register(this, ptr, this);
   }
 
   connect() { 
-    return new Connection(this, library.connect(this.#pointer)); 
+    return new Connection(this, lib.connect(this.#ptr)); 
   }
 
   close() { 
-    library.close(this.#pointer);
-    database_garbage.unregister(this); 
+    lib.close(this.#ptr);
+    db_gc.unregister(this); 
     }
 }
 
 class Connection {
-  #database;
-  #pointer;
+  #db;
+  #ptr;
 
-  constructor(database, pointer) {
-    this.#database = database;
-    this.#pointer = pointer;
-    connection_garbage.register(this, pointer, this);
+  constructor(db, ptr) {
+    this.#db = db;
+    this.#ptr = ptr;
+    con_gc.register(this, ptr, this);
   }
-  query(sql) {
-    return library.query(this.#pointer, sql);
-  }
-  query_ipc(sql) { 
-    return library.query_ipc(this.#pointer, sql); 
+  query_arrow(sql) { 
+    return lib.query_arrow(this.#ptr, sql); 
   }
   close() { 
-    library.disconnect(this.#pointer); 
-    connection_garbage.unregister(this); 
+    lib.disconnect(this.#ptr); 
+    con_gc.unregister(this); 
   }
 }

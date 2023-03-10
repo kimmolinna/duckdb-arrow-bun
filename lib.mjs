@@ -1,11 +1,12 @@
 import { ptr, dlopen, toArrayBuffer } from 'bun:ffi';
-import { RecordBatchReader } from 'apache-arrow';
+import { tableFromIPC,RecordBatchReader } from 'apache-arrow';
 
 const utf8e = new TextEncoder();
 
 const path = {
   linux() { return new URL(`./bin/libduckdb_bun.so`, import.meta.url); },
-  darwin() { return new URL(`./bin/libduckdb_bun.dylib`, import.meta.url); },
+//  darwin() { return new URL(`./bin/libduckdb_bun.dylib`, import.meta.url); },
+  darwin() { return new URL(`../duckdb-zig-build/zig-out/lib/libduckdb_bun.dylib`, import.meta.url); },
 }[process.platform]().pathname;
 
 const dab = dlopen(path, {
@@ -13,10 +14,10 @@ const dab = dlopen(path, {
   dab_connect: { args: ['ptr'], returns: 'ptr' },
   dab_disconnect: { args: ['ptr'], returns: 'void' },
   dab_open: { args: ['ptr'], returns: 'ptr' },
-  dab_query: { args: ['ptr','ptr'], returns: 'ptr' },
-  dab_query_ipc: { args: ['ptr','ptr'], returns: 'ptr' },
-  dab_ipc_address: { args: ['ptr'], returns: 'ptr' },
-  dab_ipc_size: { args: ['ptr'], returns: 'i64' }
+  dab_query_arrow: { args: ['ptr','ptr'], returns: 'ptr' },
+  dab_arrow_address: { args: ['ptr'], returns: 'ptr' },
+  dab_arrow_size: { args: ['ptr'], returns: 'i64' },
+  dab_arrow_msg: { args: ['ptr'], returns: 'ptr' }
 }).symbols;
 
 for (const k in dab) dab[k] = dab[k].native || dab[k];
@@ -40,16 +41,11 @@ export function open(path) {
   if (0 === db) throw new Error('duckdb: failed to open database');
   return db;
 }
-
-export function query(c, query) {
-  const res = dab.dab_query(c, ptr(utf8e.encode(query + '\0')));
-  return res;
-}
-
-export function query_ipc(c, query) {
-  const ipc = dab.dab_query_ipc(c, ptr(utf8e.encode(query + '\0')));
-  return RecordBatchReader.from(
-    toArrayBuffer(
-      dab.dab_ipc_address(ipc), 0, Number(dab.dab_ipc_size(ipc))
-      )).readAll()[0];
+export function query_arrow(c, query) {
+  const res = dab.dab_query_arrow(c, ptr(utf8e.encode(query + '\0')));
+  const address = dab.dab_arrow_address(res);
+  const size = Number(dab.dab_arrow_size(res));
+  const buf = toArrayBuffer(address, 0, size);
+  const table = tableFromIPC(buf);
+  return table;
 }
