@@ -1,5 +1,4 @@
 import { ptr, dlopen, toArrayBuffer } from 'bun:ffi';
-import { tableFromIPC,RecordBatchReader } from 'apache-arrow';
 
 const utf8e = new TextEncoder();
 
@@ -16,8 +15,7 @@ const dab = dlopen(path, {
   dab_open: { args: ['ptr'], returns: 'ptr' },
   dab_query_arrow: { args: ['ptr','ptr'], returns: 'ptr' },
   dab_arrow_address: { args: ['ptr'], returns: 'ptr' },
-  dab_arrow_size: { args: ['ptr'], returns: 'i64' },
-  dab_arrow_msg: { args: ['ptr'], returns: 'ptr' }
+  dab_arrow_size: { args: ['ptr'], returns: 'i64' }
 }).symbols;
 
 for (const k in dab) dab[k] = dab[k].native || dab[k];
@@ -46,6 +44,7 @@ export function query_arrow(c, query) {
   const address = dab.dab_arrow_address(res);
   const size = Number(dab.dab_arrow_size(res));
   const buf = toArrayBuffer(address, 0, size);
-  const table = tableFromIPC(buf);
-  return table;
+  // console.log(buf);
+  // console.log([...table]); 
+  return buf;
 }

@@ -22,7 +22,6 @@ const ipc = con.query_arrow(`
   FROM data
   GROUP BY year,month
 `);
-
-console.log([...ipc]); 
+console.log(ipc);
 con.close();
 db.close();

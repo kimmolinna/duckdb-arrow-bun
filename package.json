@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "apache-arrow": "^11.0.0",
+    "mitata": "^0.1.6",
     "vega": "^5.22.1",
     "vega-lite": "^5.6.1",
     "vega-lite-api": "^5.6.0"

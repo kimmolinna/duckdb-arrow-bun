@@ -10,7 +10,6 @@ const q = 'select i, i as a from generate_series(1, 2000) s(i)';
 console.log('benchmarking query: ' + q);
 
 bench('duckdb', () => {
-//  p.query();
   connection.query_arrow(q);
 });
 
